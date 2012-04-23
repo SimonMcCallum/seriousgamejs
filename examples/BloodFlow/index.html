@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blood Flow</title>
+<!-- Styling -->
+    <style type=text/css>
+        body{
+           background:#fff;
+           color:#222;
+           margin:1em 0 2em 6em;
+           padding:0;
+        }
+        #gjs-loader {
+            width: 50%;
+            height: 50%;
+            background: url('./public/ajax-loader.gif');
+        }
+    </style>
+<!-- Start javascript/main.js -->
+    <script src="./public/yabble.js"></script>
+    <script src="./public/gamejs.min.js"></script> 
+    <script type="text/javascript" src="./public/smoothie.js"></script>
+    <script>
+        require.setModuleRoot('./javascript/');
+        require.run('main')
+    </script>
+</head>
+<!-- Html -->
+<body>
+    <div>
+        <div id="gjs-loader">
+            Loading...
+        </div>
+	<div id="game-div">
+           <canvas id="gjs-canvas"></canvas>
+	   <canvas id="chart" width="200" height="50"></canvas>
+           <img src="images/Arterial_System_en.svg" id="body">
+        </div>
+	<p>
+           Powered by <a href="http://gamejs.org">GameJs</a>.
+        </p>
+    </div>
+</body>
+</html>
