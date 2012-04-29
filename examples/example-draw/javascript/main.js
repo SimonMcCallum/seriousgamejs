@@ -7,12 +7,13 @@ var gamejs = require('gamejs');
 var draw = require('gamejs/draw');
 var font = require('gamejs/font');
 
+
 function main() {
    // set resolution & title
    var display = gamejs.display.setMode([800, 600]);
    gamejs.display.setCaption("Example Draw");
 
-   var colorOne = '#ff0000';
+ /*  var colorOne = '#ff0000';
    var colorTwo = 'rgb(255, 50, 60)';
    var colorThree = 'rgba(50, 0, 150, 0.8)';
 
@@ -45,6 +46,32 @@ function main() {
    // render() returns a white transparent Surface containing the text (default color: black)
    var textSurface = defaultFont.render("Example Draw Test 101", "#bbbbbb");
    display.blit(textSurface, [300, 50]);
+  */ 
+   
+   function basic(container) {
+    var d1 = [
+        [0, 3],
+        [4, 8],
+        [8, 5],
+        [9, 13]
+    ],
+        d2 = [],
+        i, graph;
+    for (i = 0; i < 14; i += 0.5) {
+        d2.push([i, Math.sin(i)]);
+    }
+    graph = Flotr.draw(container, [d1, d2], {
+        xaxis: {
+            minorTickFreq: 4
+        },
+        grid: {
+            minorVerticalLines: true
+        }
+    });
+   basic(document.getElementById("gjs-canvas"));
+}
+
+   
 };
 
 // gamejs.ready will call your main function

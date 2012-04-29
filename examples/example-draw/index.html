@@ -10,6 +10,11 @@
            margin:1em 0 2em 6em;
            padding:0;
         }
+    #container {
+        width : 600px;
+        height: 384px;
+        margin: 8px auto;
+      }
         #gjs-loader {
             width: 50%;
             height: 50%;
@@ -18,6 +23,7 @@
     </style>
     <script src="../skeleton/public/yabble.js"></script>
     <script src="../skeleton/public/gamejs.min.js"></script>
+   <script type="text/javascript" src="../skeleton/public/flotr2.min.js"></script>
     <script>
         require.setModuleRoot('./javascript/');
         require.run('main')
@@ -33,5 +39,46 @@
         Powered by <a href="http://gamejs.org">GameJs</a>.
         </p>
     </div>
+    <div id="container"></div>
+    <!--[if IE]>
+    <script type="text/javascript" src="/static/lib/FlashCanvas/bin/flashcanvas.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/static/js/flotr2.min.js"></script>
+    <script type="text/javascript">
+      (function () {
+
+        var
+          container = document.getElementById('container'),
+          start = (new Date).getTime(),
+          data, graph, offset, i;
+
+        // Draw a sine curve at time t
+        function animate (t) {
+
+          data = [];
+          offset = 2 * Math.PI * (t - start) / 10000;
+
+          // Sample the sine function
+          for (i = 0; i < 4 * Math.PI; i += 0.2) {
+            data.push([i, Math.sin(i - offset)]);
+          }
+
+          // Draw Graph
+          graph = Flotr.draw(container, [ data ], {
+            yaxis : {
+              max : 2,
+              min : -2
+            }
+          });
+
+          // Animate
+          setTimeout(function () {
+            animate((new Date).getTime());
+          }, 50);
+        }
+
+        animate(start);
+      })();
+    </script>
 </body>
 </html>
