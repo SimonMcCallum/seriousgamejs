@@ -1,1 +1,2 @@
-var rate=200;
+
+var heartrate=200;

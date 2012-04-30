@@ -50,11 +50,11 @@ function basic(container) {
 
     function tick(msDuration) {
 // 	bloodflow1.append(heart.rate, Math.random() * 1000);
-//	chart.streamTo(document.getElementById("gjs-canvas"), 500);
-        heart.rate += 1;
+	    basic(document.getElementById("graphcanvas-div"));
+        heartrate += 1;
         display.clear();
         display.blit(gamejs.backgroundImage);
-        display.blit(textcontainer.render('Blood'+heart.rate));
+        display.blit(textcontainer.render('Blood'+heartrate));
         basic(document.getElementById("gjs-graph"));
         return;
     };
