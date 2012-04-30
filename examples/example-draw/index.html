@@ -10,16 +10,27 @@
            margin:1em 0 2em 6em;
            padding:0;
         }
-    #container {
+    #game-div {
         width : 600px;
         height: 384px;
         margin: 8px auto;
       }
-        #gjs-loader {
-            width: 50%;
-            height: 50%;
-            background: url('../skeleton/public/ajax-loader.gif');
-        }
+     #game-canvas {
+        width : 600px;
+        height: 384px;
+        margin: 8px auto;
+      }
+    #graph-canvas {
+        width : 600px;
+        height: 384px;
+        margin: 8px auto;
+      }
+   #gjs-loader {
+        width: 50%;
+        height: 50%;
+        background: url('../skeleton/public/ajax-loader.gif');
+      }
+      
     </style>
     <script src="../skeleton/public/yabble.js"></script>
     <script src="../skeleton/public/gamejs.min.js"></script>
@@ -34,7 +45,14 @@
         <div id="gjs-loader">
          Loading...
         </div>
-        <canvas id="gjs-canvas"></canvas>
+        <div id="game-div">
+             <div id="gamedcanvas-div">
+                 <canvas id="gjs-canvas"></canvas>
+             </div>
+              <div id="graphcanvas-div">
+                 <canvas id="graph-canvas"></canvas>
+             </div>
+        </div>
         <p>
         Powered by <a href="http://gamejs.org">GameJs</a>.
         </p>
@@ -48,7 +66,7 @@
       (function () {
 
         var
-          container = document.getElementById('container'),
+          container = document.getElementById('graph-canvas'),
           start = (new Date).getTime(),
           data, graph, offset, i;
 
