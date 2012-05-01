@@ -38,7 +38,7 @@
     </style>
 <!-- Start javascript/main.js -->
     <script src="./public/yabble.js"></script>
-    <script src="./public/gamejs.min.js"></script> 
+    <script src="./public/gamejs.mini.js"></script> 
    <script src="./javascript/heart.js"></script>
    <script type="text/javascript" src="./public/flotr2.min.js"></script>
 <!-- <script type="text/javascript" src="./public/smoothie.js"></script> -->
