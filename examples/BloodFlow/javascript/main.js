@@ -24,12 +24,7 @@ function main() {
    
 
 function basic(container) {
-    var d1 = [
-        [0, 3],
-        [4, 8],
-        [8, 5],
-        [9, 13]
-    ],
+    var d1 = [],
         d2 = [],
         i, graph;
     for (i = 0; i < 14; i += 0.5) {
