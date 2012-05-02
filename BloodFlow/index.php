@@ -34,11 +34,23 @@
             top:-170px;
             margin: 0px auto;
         }
+        #slider {
+            width : 10px;
+            height: 100px;
+            position: absolute;
+            left: 40px;
+            top:150px;
+            margin: 0px auto;
+        }
         
     </style>
+    <link type="text/css" href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" />
+    
 <!-- Start javascript/main.js -->
     <script src="./public/yabble.js"></script>
     <script src="./public/gamejs.mini.js"></script> 
+    <script src="./javascript/jquery-1.7.2.min.js"></script> 
+    <script src="./javascript/jquery-ui-1.8.20.custom.min.js"></script> 
    <script src="./javascript/heart.js"></script>
    <script type="text/javascript" src="./public/flotr2.min.js"></script>
 <!-- <script type="text/javascript" src="./public/smoothie.js"></script> -->
@@ -57,6 +69,7 @@
         <div id="game-div">
              <div id="gamedcanvas-div">
                  <canvas id="gjs-canvas"></canvas>
+                 <div id="slider"></div>
              </div>
               <div id="graphcanvas-div">
                  <canvas id="graph-canvas"></canvas>

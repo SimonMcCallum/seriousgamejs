@@ -1,6 +1,7 @@
 var gamejs = require('gamejs');
 
 var frameNumber = 0;
+//document.frameNumber = frameNumber;
 var FPS = 30;
 
 
@@ -12,7 +13,19 @@ var Heart = function (maxrate)
     this.beat =0;
     this.beatDuration = 4;
     this.rect= new gamejs.Rect([10,70]);
-    this.speed = 0;
+    
+    $("#slider").slider({ orientation: "vertical", min : 20 , max: maxrate, values: [this.rate,this.rate] });
+    $("#slider").slider({
+    	   slide: function(event, ui) {
+    		   value = $("#slider").slider('value', 1);
+    		   console.debug(value);
+    	      if ($("#slider").slider('value', 0) == ui.value){
+    			   document.heart.rate = ui.value;
+    		   }else{ 
+    			   return false;
+    		   }
+    	   }
+    	});
    // ever ship has its own scale
    this.originalImage = gamejs.image.load("images/heart.png");
    this.dims = this.originalImage.getSize();
@@ -47,7 +60,8 @@ var Score = function (initScore)
 };
 gamejs.utils.objects.extend(Score, gamejs.sprite.Sprite);
 Score.prototype.update = function(msDuration) {
-   this.value += 1;
+	console.debug(document.heart.rate);
+   this.value = frameNumber;
    this.image = this.textcontainer.render('Score '+this.value);
 };
 
@@ -65,10 +79,11 @@ function main() {
 
 // inherit (actually: set prototype)
  var heart = new Heart(200);
+ document.heart = heart;
  var score = new Score(100);
+ document.score = score;
  
 var graphContainer = document.getElementById("graphcanvas-div");
-
 
  //   chart.addTimeSeries(bloodflow1, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
    
@@ -79,7 +94,9 @@ function basic(container) {
         i, graph;
     for (i = score.value/20; i < score.value/20 + 14; i += 0.05) {
         d2.push([i, Math.sin(i)]);
+        d1.push([i,document.heart.rate]);
     }
+    
     graph = Flotr.draw(container, [d1, d2], {
         xaxis: {
             minorTickFreq: 4
