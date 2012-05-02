@@ -4,6 +4,7 @@ var frameNumber = 0;
 var running = false;
 //document.frameNumber = frameNumber;
 var FPS = 30;
+var currentObjective = 70;
 
 $('#submitScore').click(
 		function() {
@@ -69,8 +70,10 @@ var Score = function (initScore)
 };
 gamejs.utils.objects.extend(Score, gamejs.sprite.Sprite);
 Score.prototype.update = function(msDuration) {
-	console.debug(document.heart.rate);
-   this.value = frameNumber;
+	console.debug(document.headrate[30]);
+	if (document.headrate.length > 30) {
+		this.value += Math.abs(document.headrate[30] - document.legsrate[1]);
+	}
    this.image = this.textcontainer.render('Score '+this.value);
 };
 
@@ -92,8 +95,10 @@ function main() {
  document.score = score;
  
 var graphContainer = document.getElementById("graphcanvas-div");
-var head = [];
-var legs = [];
+var headrate = [];
+var legsrate = [];
+document.headrate=headrate;
+document.legsrate=legsrate;
 
 
  //   chart.addTimeSeries(bloodflow1, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
@@ -106,7 +111,7 @@ function basic(container) {
     //    legs.push([i,document.heart.rate]);
     //}
     
-    graph = Flotr.draw(container, [head, legs], {
+    graph = Flotr.draw(container, [headrate, legsrate], {
         xaxis: {
             minorTickFreq: 4, min : frameNumber-30, max : frameNumber+30
         },
@@ -125,8 +130,14 @@ function basic(container) {
 
    sprites.update(0);
    //score.update(msDuration);
-   head.push([frameNumber,heart.rate]);
+   for(var i=0;i<30;i++){
+	   legsrate.push([i,currentObjective]);
+   }
+   headrate.push([frameNumber,heart.rate]);
    basic(graphContainer);
+   
+   
+   
 //   scoreText = textcontainer.render('Score '+heart.rate);
 //   scoreText.rect = new gamejs.Rect([500,10]);
    display.clear();
@@ -139,8 +150,12 @@ function basic(container) {
         frameNumber +=1;
         sprites.update(msDuration);
         //score.update(msDuration);
-        if (head.length>60) head.shift();
-        head.push([frameNumber,heart.rate]); //Update the graph with current value of heart
+        if (headrate.length>60) headrate.shift();
+        headrate.push([frameNumber,heart.rate]); //Update the graph with current value of heart
+        if (legsrate.length>60) legsrate.shift();
+        legsrate.push([frameNumber+30,currentObjective]); //Update the graph with current value of heart
+        
+        if(Math.random() < 0.02) currentObjective = 20+(Math.random()*160);
         
         
 	    basic(graphContainer);
