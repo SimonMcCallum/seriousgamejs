@@ -1,8 +1,18 @@
 var gamejs = require('gamejs');
 
 var frameNumber = 0;
+var running = false;
 //document.frameNumber = frameNumber;
 var FPS = 30;
+
+$('#submitScore').click(
+		function() {
+			$.post("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value, {score: document.score.value} );
+			console.debug("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value);
+		});
+$('#play').click(function() {running=!running; $('#play').button("option", "label", "custom label");});
+
+
 
 
  
@@ -17,9 +27,8 @@ var Heart = function (maxrate)
     $("#slider").slider({ orientation: "vertical", min : 20 , max: maxrate, values: [this.rate,this.rate] });
     $("#slider").slider({
     	   slide: function(event, ui) {
-    		   value = $("#slider").slider('value', 1);
-    		   console.debug(value);
-    	      if ($("#slider").slider('value', 0) == ui.value){
+    		   console.debug(ui);
+    	      if (ui.values[0] == ui.value){
     			   document.heart.rate = ui.value;
     		   }else{ 
     			   return false;
@@ -35,7 +44,7 @@ var Heart = function (maxrate)
 gamejs.utils.objects.extend(Heart, gamejs.sprite.Sprite);
 Heart.prototype.update = function(msDuration) {
    // moveIp = move in place
-   if (frameNumber%((FPS*60)/this.rate) == 0){
+   if (frameNumber%((FPS*60)/this.rate) > 1){
        this.image = gamejs.transform.scale(this.originalImage, [this.dims[0] * (0.55),this.dims[1] *  (0.55)]);
        this.beat = this.beatDuration;
     }else{
@@ -68,7 +77,6 @@ Score.prototype.update = function(msDuration) {
 
 
 
-
 function main() {
     var display = gamejs.display.setMode([700, 480]);
  //   var bloodflow1 = new TimeSeries();
@@ -84,23 +92,25 @@ function main() {
  document.score = score;
  
 var graphContainer = document.getElementById("graphcanvas-div");
+var head = [];
+var legs = [];
+
 
  //   chart.addTimeSeries(bloodflow1, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
    
 
 function basic(container) {
-    var d1 = [],
-        d2 = [],
-        i, graph;
-    for (i = score.value/20; i < score.value/20 + 14; i += 0.05) {
-        d2.push([i, Math.sin(i)]);
-        d1.push([i,document.heart.rate]);
-    }
+    var i, graph;
+    //for (i = score.value/20; i < score.value/20 + 14; i += 0.05) {
+    //    head.push([i, Math.sin(i)]);
+    //    legs.push([i,document.heart.rate]);
+    //}
     
-    graph = Flotr.draw(container, [d1, d2], {
+    graph = Flotr.draw(container, [head, legs], {
         xaxis: {
-            minorTickFreq: 4
+            minorTickFreq: 4, min : frameNumber-30, max : frameNumber+30
         },
+        yaxis: {min : 15, max : 205},
         grid: {
             minorVerticalLines: true
         }
@@ -113,12 +123,26 @@ function basic(container) {
    sprites.add(score);
 
 
+   sprites.update(0);
+   //score.update(msDuration);
+   head.push([frameNumber,heart.rate]);
+   basic(graphContainer);
+//   scoreText = textcontainer.render('Score '+heart.rate);
+//   scoreText.rect = new gamejs.Rect([500,10]);
+   display.clear();
+   display.blit(gamejs.backgroundImage);
+   sprites.draw(display);
+   
     function tick(msDuration) {
+    if(running){
 // 	bloodflow1.append(heart.rate, Math.random() * 1000);
         frameNumber +=1;
         sprites.update(msDuration);
         //score.update(msDuration);
-
+        if (head.length>60) head.shift();
+        head.push([frameNumber,heart.rate]); //Update the graph with current value of heart
+        
+        
 	    basic(graphContainer);
 //        scoreText = textcontainer.render('Score '+heart.rate);
 //        scoreText.rect = new gamejs.Rect([500,10]);
@@ -126,7 +150,8 @@ function basic(container) {
         display.blit(gamejs.backgroundImage);
         sprites.draw(display);
         //score.draw(display);
-        return;
+    	}
+      return;
     };
     
     

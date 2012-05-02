@@ -45,6 +45,10 @@
         
     </style>
     <link type="text/css" href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" />
+    <style type=text/css>
+          .ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 0.9em; height: 0.4em; cursor: pointer; }
+          .ui-slider-vertical .ui-slider-handle { left: -0.2em; margin-left: 0; margin-bottom: -.6em; }
+    </style>
     
 <!-- Start javascript/main.js -->
     <script src="./public/yabble.js"></script>
@@ -70,6 +74,11 @@
              <div id="gamedcanvas-div">
                  <canvas id="gjs-canvas"></canvas>
                  <div id="slider"></div>
+                 <button id="submitScore">Submit</button>
+                 <button id="play">Play</button>
+                 <div id="artHead"></div>
+                 <div id="artLegs"></div>
+                 <div id="artArms"></div>
              </div>
               <div id="graphcanvas-div">
                  <canvas id="graph-canvas"></canvas>
