@@ -79,6 +79,7 @@
                  <div id="artHead"></div>
                  <div id="artLegs"></div>
                  <div id="artArms"></div>
+                 <div id="submit"></div>
              </div>
               <div id="graphcanvas-div">
                  <canvas id="graph-canvas"></canvas>
