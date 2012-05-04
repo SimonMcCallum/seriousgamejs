@@ -27,25 +27,31 @@ $('#play').click(function() {running=!running; $('#play').button("option", "labe
 
 var Control = function (rectCont, rectDest)
 {
-	radius = 20;
+	this.radius = 20; //outside radius 
+	this.flow = 10; //this is the current flow through the control
+	
     Control.superConstructor.apply(this, arguments);
    this.originalImage = gamejs.image.load("images/Artery.png");
    this.dims = this.originalImage.getSize();
    this.image = gamejs.transform.scale(this.originalImage, [1,1]);
    this.rect = gamejs.Rect(rectCont);
+   this.rectCont = rectCont;
    var rectD = [];
    rectD[0] =rectCont[0]+2;
-   rectD[1] =rectCont[1]+radius;
-  draw.circle(gamejs.backgroundImage, "#ff0033",rectCont, radius,  2);
-   draw.line(gamejs.backgroundImage, "#ff0033",rectD,rectDest,2); //[this.rect.x+2, this.rect.y-radius], [this.rectD.x, this.rectD.y], 2);
-   rectD[1] =rectCont[1]-radius;
-   draw.line(gamejs.backgroundImage, "#ff0033",rectD,rectDest,2); //[this.rect.x+2, this.rect.y-radius], [this.rectD.x, this.rectD.y], 2);
+   rectD[1] =rectCont[1]+this.radius;
+  draw.circle(gamejs.backgroundImage, "#ff3366",rectCont, this.radius,  0);
+  draw.circle(gamejs.backgroundImage, "#fffff",rectCont, this.flow,  0);
+
+  draw.line(gamejs.backgroundImage, "#ff3366",rectD,rectDest,2); //[this.rect.x+2, this.rect.y-radius], [this.rectD.x, this.rectD.y], 2);
+   rectD[1] =rectCont[1]-this.radius;
+   draw.line(gamejs.backgroundImage, "#ff3366",rectD,rectDest,2); //[this.rect.x+2, this.rect.y-radius], [this.rectD.x, this.rectD.y], 2);
    return this;
 };
 
 gamejs.utils.objects.extend(Control, gamejs.sprite.Sprite);
 Control.prototype.update = function(msDuration) {
- 
+	  draw.circle(gamejs.backgroundImage, "#ff3366",this.rectCont, this.radius,  0);
+	  draw.circle(gamejs.backgroundImage, "#ffffff",this.rectCont, this.flow,  0);
 };
 
 
@@ -196,6 +202,8 @@ function basic(container) {
    var sprites = new gamejs.sprite.Group();
    sprites.add(heart);
    sprites.add(score);
+   sprites.add(controls.head);
+   sprites.add(controls.arms);
 
 
    sprites.update(0);
