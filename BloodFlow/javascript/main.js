@@ -11,7 +11,7 @@ var currentObjective = 70;
 
 //This is the submission of score section.  
 function submitScore(value){
-	$.post("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value+"level="+levelNumber, {score: document.score.value, level: levelNumber} );
+	$.post("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value+"&level="+levelNumber, {score: document.score.value, level: levelNumber} );
 	console.debug("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value);
 }
 
@@ -25,22 +25,30 @@ $('#play').click(function() {running=!running; $('#play').button("option", "labe
 
 
 
-var Control = function (rectCont, rectDest)
+var Control = function (rectCont, rectDest, slider)
 {
 	this.radius = 20; //outside radius 
 	this.flow = 10; //this is the current flow through the control
 	
-    Control.superConstructor.apply(this, arguments);
+   Control.superConstructor.apply(this, arguments);
    this.originalImage = gamejs.image.load("images/Artery.png");
    this.dims = this.originalImage.getSize();
    this.image = gamejs.transform.scale(this.originalImage, [1,1]);
    this.rect = gamejs.Rect(rectCont);
    this.rectCont = rectCont;
    var rectD = [];
+   slider.slider({ orientation: "vertical", min : 2 , max: 20, value: 10 });
+   slider.slider({
+   	   slide: function(event, ui) {
+   	     console.debug(this, event, ui);
+   	     document.gameState.controls.updateFlow(this.id, ui.value);
+   	   }
+   	});
+
    rectD[0] =rectCont[0]+2;
    rectD[1] =rectCont[1]+this.radius;
   draw.circle(gamejs.backgroundImage, "#ff3366",rectCont, this.radius,  0);
-  draw.circle(gamejs.backgroundImage, "#fffff",rectCont, this.flow,  0);
+  draw.circle(gamejs.backgroundImage, "#ffffff",rectCont, this.flow,  0);
 
   draw.line(gamejs.backgroundImage, "#ff3366",rectD,rectDest,2); //[this.rect.x+2, this.rect.y-radius], [this.rectD.x, this.rectD.y], 2);
    rectD[1] =rectCont[1]-this.radius;
@@ -50,10 +58,13 @@ var Control = function (rectCont, rectDest)
 
 gamejs.utils.objects.extend(Control, gamejs.sprite.Sprite);
 Control.prototype.update = function(msDuration) {
+	  draw.circle(gamejs.backgroundImage, "#ffffff",this.rectCont, this.radius+1,  0);
 	  draw.circle(gamejs.backgroundImage, "#ff3366",this.rectCont, this.radius,  0);
-	  draw.circle(gamejs.backgroundImage, "#ffffff",this.rectCont, this.flow,  0);
+	  draw.circle(gamejs.backgroundImage, "#cccccc",this.rectCont, this.flow,  0);
 };
-
+Control.prototype.setFlow = function(value) {
+	  this.flow = Math.max(Math.min(value,radius-2, 2));
+};
 
 
  
@@ -67,14 +78,19 @@ var Heart = function (maxrate)
     this.beatDuration = 4;
     this.rect= new gamejs.Rect([10,70]);
     
-    $("#slider").slider({ orientation: "vertical", min : 20 , max: maxrate, value: this.rate });
-    $("#slider").slider({
+    $("#heartRateSlider").slider({ orientation: "vertical", min : 20 , max: maxrate, value: this.rate });
+    $("#heartRateSlider").slider({
     	   slide: function(event, ui) {
     		// console.debug(ui);
     	     document.heart.rateGoal = ui.value;
     	   }
     	});
-   // ever ship has its own scale
+    
+    
+    
+    
+    
+    // ever ship has its own scale
    this.originalImage = gamejs.image.load("images/heart.png");
    this.dims = this.originalImage.getSize();
    this.image = gamejs.transform.scale(this.originalImage, [this.dims[0] * (0.4), this.dims[1] *  (0.4)]);
@@ -168,14 +184,24 @@ rates.lowerlegrate = [];
 rates.upperlegrate = [];
 
 var controls = new Object();
-controls.head = new Control([350,80], [620,70]);
+controls.head = new Control([200,80], [550,70],$("#artHead"));
 //controls.legs = new Control([300,120], [620,70]);
-controls.arms = new Control([300,140], [570,110]);
-controls.lowerleg = new Control([300,220], [600,250]);
-controls.upperleg = new Control([350,270], [600,320]);
+controls.arms = new Control([150,140], [495,110],$("#artArms"));
+controls.upperLeg = new Control([150,220], [530,250],$("#artUpperLeg"));
+controls.lowerLeg = new Control([200,270], [530,320],$("#artLowerLeg"));
 
 gameState.rates=rates;
+gameState.controls = controls;
 
+gameState.controls.updateFlow = function (id,value){
+	console.debug(id,value,controls);
+	if (id == "artHead" ) controls.head.flow = value;
+	if (id == "artArms" ) controls.arms.flow = value;
+	if (id == "artLowerLeg" ) controls.lowerLeg.flow = value;
+	if (id == "artUpperLeg" ) controls.upperLeg.flow = value;
+	console.debug(controls.head.flow);
+	
+};
 
  //   chart.addTimeSeries(bloodflow1, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
    
@@ -204,6 +230,8 @@ function basic(container) {
    sprites.add(score);
    sprites.add(controls.head);
    sprites.add(controls.arms);
+   sprites.add(controls.upperLeg);
+   sprites.add(controls.lowerLeg);
 
 
    sprites.update(0);
@@ -223,32 +251,71 @@ function basic(container) {
    display.blit(gamejs.backgroundImage);
    sprites.draw(display);
    
+   
+   var events = gamejs.event.get();
+   
+   events.forEach(function(event) {
+		console.debug(event);
+      if (event.type === gamejs.event.MOUSE_DOWN) {
+        var hitTest = sprites.collidePoint(event.pos);
+    	if (hitTest.length > 0){
+    		console.debug(hitTest);
+        	hitTest[0].setRate(15);
+        }
+      }
+   });
+   
+   
     function tick(msDuration) {
-    if(running){
-// 	bloodflow1.append(heart.rate, Math.random() * 1000);
-        frameNumber +=1;
         sprites.update(msDuration);
-        score.update(msDuration);
-        if (rates.headrate.length>30) rates.headrate.shift();
-        rates.headrate.push([frameNumber,heart.rate]); //Update the graph with current value of heart
-        if (rates.legsrate.length>60) rates.legsrate.shift();
-        rates.legsrate.push([frameNumber+30,currentObjective]); //Update the graph with current value of heart
+  	
+    if(running){
+//    	   var events = gamejs.event.get();
+ /*   	   
+    	   events.forEach(function(event) {
+    	      if (event.type === gamejs.event.MOUSE_DOWN) {
+      			console.debug(event);
+    	        var hitTest = sprites.collidePoint();
+    	    	if (hitTest.length > 0){
+    	    		console.debug(hitTest);
+    	        	hitTest[0].setRate(15);
+    	        }
+    	      }
+    	   });
+ */   	
+        frameNumber +=1;
         
-        if(Math.random() < 0.02) currentObjective = 20+(Math.random()*160);
+        score.update(msDuration);
+        
+        if (rates.headrate.length>30) {
+        	rates.headrate.shift();
+        }
+
+        rates.headrate.push([frameNumber,heart.rate]); //Update the graph with current value of heart
+
+        if (rates.legsrate.length>60) {
+        	rates.legsrate.shift();
+        }
+        if (frameNumber < 500-30){
+        	rates.legsrate.push([frameNumber+30,currentObjective]); //Update the graph with current value of heart
+        }
+        if(Math.random() < 0.02) {
+        	currentObjective = 20+(Math.random()*160);
+        }
         
         
 	    basic(graphContainer);
 //        scoreText = textcontainer.render('Score '+heart.rate);
 //        scoreText.rect = new gamejs.Rect([500,10]);
+	    if (frameNumber > 500){
+        	running = false;
+        	submitScore();
+        }
+       } // end the running code
         display.clear();
         display.blit(gamejs.backgroundImage);
         sprites.draw(display);
         //score.draw(display);
-        if (frameNumber > 500){
-        	running = false;
-        	submitScore();
-        }
-       }
       return;
     };
     
