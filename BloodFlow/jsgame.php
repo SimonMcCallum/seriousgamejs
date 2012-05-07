@@ -3,12 +3,13 @@
 <head>
     <title>Blood Flow</title>
 <!-- Styling -->
-	<link rel="stylesheet" type="text/css/" href="css/smoothness/jquery-ui-1.8.20.custom.css" />
+   	<link type="text/css" rel="stylesheet"  href="css/jsgame.css" />
+   	<link type="text/css" rel="stylesheet" href="css/smoothness/jquery-ui-1.8.20.custom.css" />
+
      <style type=text/css>
           .ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 0.9em; height: 0.4em; cursor: pointer; };
           .ui-slider-vertical .ui-slider-handle { left: -0.2em; margin-left: 0; margin-bottom: -.6em; };
     </style>
-   <link type="text/css" href="css/jsgame.css" rel="stylesheet" />
  
    
     
@@ -28,10 +29,16 @@
 <body>
     <div>
         <div id="gjs-loader">
-              <div id="loading">Loading: </div>
+              <div id="loading"></div>
         </div>
         <div id="game-div">
-             <div id="gamedcanvas-div">
+             <div id="menu" class="toggler>
+				<div id="menutext" class="ui-widget-content ui-corner-all">
+				    <div id="playGame"></div>
+				</div>
+		</div>
+		
+             <div id="gamecanvas-div">
                  <canvas id="gjs-canvas"></canvas>
                  <div id="heartRateSlider"></div>
                  <div id="artHead"></div>
@@ -39,11 +46,10 @@
                  <div id="artUpperLeg"></div>
                  <div id="artLowerLeg"></div>
                  <div id="submit"></div>
+                 <div id="play"></div>
+             	 <div id="graphcanvas-div">            	 
+             	</div> 
                  <button id="submitScore">Submit</button>
-                 <button id="play">Play</button>
-            </div>
-              <div id="graphcanvas-div">
-                 <canvas id="graph-canvas"></canvas>
              </div>
         </div>
     </div>

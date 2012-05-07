@@ -1,25 +1,29 @@
 var gamejs = require('gamejs');
 var draw = require('gamejs/draw');
 
+
+//create a game state to put items into so they can be accessesd
+var gameState= new Object();
+document.gameState = gameState;
+
+gameState.levels = [];
+gameState.levels[0] = [[0,70],[20,80]];
+gameState.level = 0;
 var frameNumber = 0;
 var exerciseTime = 0;
-var levelNumber = 0;
-var running = false;
+gameState.running = false;
 //document.frameNumber = frameNumber;
 var FPS = 20;
 var currentObjective = 70;
 
 //This is the submission of score section.  
 function submitScore(value){
-	$.post("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value+"&level="+levelNumber, {score: document.score.value, level: levelNumber} );
+	$.post("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value+"&level="+gameState.level, {score: document.score.value, level: gameState.level} );
 	console.debug("http://gamemetrics.otago.ac.nz/scores.php?score="+document.score.value);
 }
 
 //respond to button push
 $('#submitScore').click(submitScore);
-
-
-$('#play').click(function() {running=!running; $('#play').button("option", "label", "custom label");});
 
 
 
@@ -40,7 +44,7 @@ var Control = function (rectCont, rectDest, slider)
    slider.slider({ orientation: "vertical", min : 2 , max: 20, value: 10 });
    slider.slider({
    	   slide: function(event, ui) {
-   	     console.debug(this, event, ui);
+   	     //console.debug(this, event, ui);
    	     document.gameState.controls.updateFlow(this.id, ui.value);
    	   }
    	});
@@ -72,6 +76,7 @@ var Heart = function (maxrate)
 {
     Heart.superConstructor.apply(this, arguments);
     this.rate= 0.5*maxrate;
+    this.maxrate = maxrate;
     this.rateGoal= this.rate;
     this.ratedelta= 0.0;
      this.beat =0;
@@ -85,8 +90,14 @@ var Heart = function (maxrate)
     	     document.heart.rateGoal = ui.value;
     	   }
     	});
-    
-    
+    bar = new Object();
+    bar.x = 30;
+    bar.y = 90;
+    bar.width =15;
+    bar.range = 40;
+	draw.rect(gamejs.backgroundImage, "#ff0000",[bar.x,bar.y,bar.x+bar.width,bar.y+bar.range],2);
+	draw.rect(gamejs.backgroundImage, "#ff0000",[bar.x,bar.y+(bar.range*((this.rate-20)/(maxrate-20))),bar.x+bar.width,bar.y+bar.range],0);
+
     
     
     
@@ -107,9 +118,17 @@ Heart.prototype.update = function(msDuration) {
 		this.ratedelta -= 0.2; 
 	} */
 	this.ratedelta = this.rateGoal - this.rate;
-	console.debug(this.ratedelta+" "+this.rateGoal + this);
+	//console.debug(this.ratedelta+" "+this.rateGoal + this);
 	this.ratedelta = Math.min(Math.max(this.ratedelta, -5),+5);
 	this.rate += this.ratedelta;
+	console.debug(gamejs.backgroundImage,bar,this.rate);
+	draw.rect(gamejs.backgroundImage, "#ff0000",[bar.x,bar.y,bar.x+bar.width,bar.y+bar.range],2);
+	draw.rect(gamejs.backgroundImage, "#ff0000",[bar.x,bar.y+(bar.range*((this.rate-20)/(this.maxrate-20))),bar.x+bar.width,bar.y+bar.range],0);
+	if (document.gameState.running == false){
+		document.gameState.rates.headrate[document.gameState.rates.headrate.length-2]=[frameNumber-1,document.heart.rate];
+		document.gameState.rates.headrate[document.gameState.rates.headrate.length-1]=[frameNumber  ,document.heart.rate];
+	}
+		
   if (frameNumber%((FPS*60)/this.rate) < 1){
        this.image = gamejs.transform.scale(this.originalImage, [this.dims[0] * (0.45),this.dims[1] *  (0.45)]);
        this.beat = this.beatDuration;
@@ -143,9 +162,19 @@ var Score = function (initScore)
 };
 gamejs.utils.objects.extend(Score, gamejs.sprite.Sprite);
 Score.prototype.update = function(msDuration) {
-	console.debug(document.gameState.rates.headrate[30], document.gameState.rates.legsrate[30]);
+//	console.debug(document.gameState.rates.headrate[30], document.gameState.rates.legsrate[30]);
 //	console.debug(Math.abs((document.headrate[60])[1] - document.gameState.rates.legsrate[30][1]));
-	console.debug(document.gameState.rates.headrate.length);
+//	console.debug(document.gameState.rates.headrate.length);
+//	if (document.gameState.rates.headrate.length > 30) {
+//		partialvalue = document.calcScore(document.gameState.rates.headrate[30][1],document.gameState.rates.legsrate[30][1]);
+//		this.value +=partialvalue;
+//	}
+   this.image = this.textcontainer.render('Score '+Math.round(this.value));
+};
+Score.prototype.updateScore = function(value) {
+//	console.debug(document.gameState.rates.headrate[30], document.gameState.rates.legsrate[30]);
+//	console.debug(Math.abs((document.headrate[60])[1] - document.gameState.rates.legsrate[30][1]));
+//	console.debug(document.gameState.rates.headrate.length);
 	if (document.gameState.rates.headrate.length > 30) {
 		partialvalue = document.calcScore(document.gameState.rates.headrate[30][1],document.gameState.rates.legsrate[30][1]);
 		this.value +=partialvalue;
@@ -154,6 +183,7 @@ Score.prototype.update = function(msDuration) {
 };
 
 
+//*********************Main  ******************************
 
 
 function main() {
@@ -164,7 +194,18 @@ function main() {
 
     gamejs.backgroundImage = gamejs.image.load("images/background.png");
 
-// inherit (actually: set prototype)
+ $("#play").button( "option", "icons", {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} );
+ $("#play").text("Play");
+ $("#play").click(function() {
+	 if (gameState.running){
+		 gameState.running =false; 
+		 $("#play").text("Play");
+	 } else {
+		 gameState.running =true; 
+		 $("#play").text("Pause"); 
+	 }
+	 });
+
  var heart = new Heart(200);
  document.heart = heart;
  var score = new Score(0);
@@ -172,9 +213,8 @@ function main() {
  
 var graphContainer = document.getElementById("graphcanvas-div");
 
-//create a game state to put items into so they can be accessesd
-var gameState= new Object();
-document.gameState = gameState;
+$("#menu").prepend('<img id="theImg" src=../images/menu.png)');
+$("#menu").remove();
 
 var rates = new Object();
 rates.headrate = [];
@@ -194,7 +234,7 @@ gameState.rates=rates;
 gameState.controls = controls;
 
 gameState.controls.updateFlow = function (id,value){
-	console.debug(id,value,controls);
+	//console.debug(id,value,controls);
 	if (id == "artHead" ) controls.head.flow = value;
 	if (id == "artArms" ) controls.arms.flow = value;
 	if (id == "artLowerLeg" ) controls.lowerLeg.flow = value;
@@ -206,14 +246,10 @@ gameState.controls.updateFlow = function (id,value){
  //   chart.addTimeSeries(bloodflow1, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
    
 
+
 function basic(container) {
-    var i, graph;
-    //for (i = score.value/20; i < score.value/20 + 14; i += 0.05) {
-    //    head.push([i, Math.sin(i)]);
-    //    legs.push([i,document.heart.rate]);
-    //}
     
-    graph = Flotr.draw(container, [rates.headrate, rates.legsrate], {
+    graph = Flotr.draw(container, [rates.headrate, rates.legsrate, document.gameState.levels[document.gameState.level]], {
         xaxis: {
             minorTickFreq: 4, min : frameNumber-30, max : frameNumber+30
         },
@@ -224,6 +260,9 @@ function basic(container) {
     });
 };
    
+
+
+
 
    var sprites = new gamejs.sprite.Group();
    sprites.add(heart);
@@ -240,6 +279,7 @@ function basic(container) {
    for(var i=0;i<30;i++){
 	   rates.legsrate.push([i,currentObjective]);
    }
+   rates.headrate.push([frameNumber-1,heart.rate]);
    rates.headrate.push([frameNumber,heart.rate]);
    basic(graphContainer);
    
@@ -269,7 +309,7 @@ function basic(container) {
     function tick(msDuration) {
         sprites.update(msDuration);
   	
-    if(running){
+    if(gameState.running){
 //    	   var events = gamejs.event.get();
  /*   	   
     	   events.forEach(function(event) {
@@ -285,7 +325,7 @@ function basic(container) {
  */   	
         frameNumber +=1;
         
-        score.update(msDuration);
+        score.updateScore(3);
         
         if (rates.headrate.length>30) {
         	rates.headrate.shift();
@@ -299,20 +339,23 @@ function basic(container) {
         if (frameNumber < 500-30){
         	rates.legsrate.push([frameNumber+30,currentObjective]); //Update the graph with current value of heart
         }
-        if(Math.random() < 0.02) {
-        	currentObjective = 20+(Math.random()*160);
-        }
+        if(frameNumber%30 == 0) {
+        	currentObjective = Math.min(Math.max(currentObjective+(-40 +(Math.random()*80)),20),200);
+           	if (currentObjective<50) currentObjective += 10;
+           	if (currentObjective>150) currentObjective -= 10;
+                   }
         
         
-	    basic(graphContainer);
+
 //        scoreText = textcontainer.render('Score '+heart.rate);
 //        scoreText.rect = new gamejs.Rect([500,10]);
 	    if (frameNumber > 500){
-        	running = false;
+        	gameState.running = false;
         	submitScore();
         }
        } // end the running code
-        display.clear();
+    	basic(graphContainer);
+    	display.clear();
         display.blit(gamejs.backgroundImage);
         sprites.draw(display);
         //score.draw(display);
@@ -323,5 +366,5 @@ function basic(container) {
     gamejs.time.fpsCallback(tick, this, FPS);
 }
 
-gamejs.preload(["images/background.png","images/heart.png","images/Artery.png"]);
+gamejs.preload(["images/background.png","images/heart.png","images/Artery.png","images/menu.png"]);
 gamejs.ready(main);

@@ -18,67 +18,87 @@
             top:-200px;
         }
         #game-div {
-            width : 600px;
+            width : 700px;
             height: 350px;
-   			margin-left: auto;
-    		margin-right:auto; 
-    		display: block;
+            top: 0px;
+   			left: 50%;
+    		margin-left: -350px; 
+            position: absolute;
         }
         #game-canvas {
-            width : 600px;
+            width : 700px;
             height: 350px;
-            position: relative;
+            position: absolute;
+            zindex:-1;
         }
-        #graphcanvas-div {
+        #gamecanvas-div{
+            width : 700px;
+            height: 150px;
+            top:0px;
+   			left: 50%;
+    		margin-left: -350px; 
+            position: absolute;
+        }
+        #graphcanvas-div{
             width : 400px;
             height: 150px;
-            left: -37px;
-            top:-450px;
-            margin: 0px auto;
-            position: relative;
+            left: 70px;
+            top:-155px;
+            position: absolute;
         }
         #heartRateSlider {
             width : 10px;
             height: 100px;
-            left: 20px;
-            top:-320px;
-            position: relative;
+            left: 25px;
+            top:150px;
+            position: absolute;
         }
        	#artHead {
             width : 4px;
             height: 40px;
             left: 165px;
-            top:-525px;
-            position: relative;
+            top:60px;
+            position: absolute;
+            z-index:5;
         }       	
         #artArms{
             width : 4px;
             height: 40px;
             left: 115px;
-            top:-505px;
-            position: relative;
+            top:120px;
+            position: absolute;
         }
         #artUpperLeg{
             width : 4px;
             height: 40px;
             left: 115px;
-            top:-470px;
-            position: relative;
+            top:200px;
+            position: absolute;
         }
 		#artLowerLeg{
             width : 4px;
             height: 40px;
             left: 165px;
-            top:-450px;
-            position: relative;
+            top:250px;
+            position: absolute;
         }
         #submitScore {
             left: 0px;
-            top:-50px;
-            position: relative;
+            top:500px;
+            position: absolute;
         }        
         #play {
-            left: 0px;
-            top:-50px;
-            position: relative;
+            left: 20px;
+            top:400px;
+            position: absolute;
+        }        
+        #menu {
+            width : 700px;
+            height: 350px;
+            top: 50px;
+   			margin-left: auto;
+    		margin-right:auto; 
+            z-index:5;
+            position: absolute;
+            background: url('../images/menu.png');
         }
