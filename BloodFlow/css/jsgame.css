@@ -56,10 +56,9 @@
        	#artHead {
             width : 4px;
             height: 40px;
-            left: 165px;
+            left: 15px;
             top:60px;
             position: absolute;
-            z-index:5;
         }       	
         #artArms{
             width : 4px;
@@ -100,5 +99,4 @@
     		margin-right:auto; 
             z-index:5;
             position: absolute;
-            background: url('../images/menu.png');
         }
